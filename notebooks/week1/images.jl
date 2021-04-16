@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.0
+# v0.14.2
 
 using Markdown
 using InteractiveUtils
@@ -12,6 +12,31 @@ macro bind(def, element)
         el
     end
 end
+
+# ╔═╡ 74b008f6-ed6b-11ea-291f-b3791d6d1b35
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.add([
+		Pkg.PackageSpec(name="ImageIO", version="0.5"),
+		Pkg.PackageSpec(name="ImageShow", version="0.2"),
+		Pkg.PackageSpec(name="FileIO", version="1.6"),
+		Pkg.PackageSpec(name="PNGFiles", version="0.3.6"),
+		Pkg.PackageSpec(name="Colors", version="0.12"),
+		Pkg.PackageSpec(name="ColorVectorSpace", version="0.8"),
+		Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
+		Pkg.PackageSpec(name="HypertextLiteral", version="0.5")
+	])
+
+	using Colors, ColorVectorSpace, ImageShow, FileIO
+	using PlutoUI
+	using HypertextLiteral
+end
+
+# ╔═╡ 71a1e08a-6abc-48d5-b177-5184dbdd76a8
+filter!(LOAD_PATH) do path
+	path != "@v#.#"
+end;
 
 # ╔═╡ e91d7926-ec6e-41e7-aba2-9dca333c8aa5
 html"""
@@ -73,31 +98,6 @@ md"""
 
 _When running this notebook for the first time, this could take up to 15 minutes. Hang in there!_
 """
-
-# ╔═╡ 74b008f6-ed6b-11ea-291f-b3791d6d1b35
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-	Pkg.add([
-		Pkg.PackageSpec(name="ImageIO", version="0.5"),
-		Pkg.PackageSpec(name="ImageShow", version="0.2"),
-		Pkg.PackageSpec(name="FileIO", version="1.6"),
-		Pkg.PackageSpec(name="PNGFiles", version="0.3.6"),
-		Pkg.PackageSpec(name="Colors", version="0.12"),
-		Pkg.PackageSpec(name="ColorVectorSpace", version="0.8"),
-		Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
-		Pkg.PackageSpec(name="HypertextLiteral", version="0.5")
-	])
-
-	using Colors, ColorVectorSpace, ImageShow, FileIO
-	using PlutoUI
-	using HypertextLiteral
-end
-
-# ╔═╡ 71a1e08a-6abc-48d5-b177-5184dbdd76a8
-filter!(LOAD_PATH) do path
-	path != "@v#.#"
-end;
 
 # ╔═╡ ca1b507e-6017-11eb-34e6-6b85cd189002
 md"""
@@ -272,18 +272,6 @@ Even more fun is to use your own webcam. Try pressing the enable button below. T
 press the camera to capture an image. Kind of fun to keep pressing the button as you move your hand etc.
 """
 
-# ╔═╡ d6742ea0-1106-4f3c-a5b8-a31a48d33f19
-@bind webcam_data1 camera_input()
-
-# ╔═╡ 1d7375b7-7ea6-4d67-ab73-1c69d6b8b87f
-myface1 = process_raw_camera_data(webcam_data1);
-
-# ╔═╡ 6224c74b-8915-4983-abf0-30e6ba04a46d
-[
-	myface1              myface1[   :    , end:-1:1]
-	myface1[end:-1:1, :] myface1[end:-1:1, end:-1:1]
-]
-
 # ╔═╡ cef1a95a-64c6-11eb-15e7-636a3621d727
 md"""
 ## Inspecting your data
@@ -343,12 +331,6 @@ md"""
 We can also use variables as indices...
 """
 
-# ╔═╡ 94b77934-713e-11eb-18cf-c5dc5e7afc5b
-row_i,col_i
-
-# ╔═╡ ff762861-b186-4eb0-9582-0ce66ca10f60
-philip[row_i, col_i]
-
 # ╔═╡ 13844ebf-52c4-47e9-bda4-106a02fad9d7
 md"""
 ...and these variables can be controlled by sliders!
@@ -359,6 +341,12 @@ md"""
 
 # ╔═╡ 6511a498-7ac9-445b-9c15-ec02d09783fe
 @bind col_i Slider(1:size(philip)[2], show_value=true)
+
+# ╔═╡ 94b77934-713e-11eb-18cf-c5dc5e7afc5b
+row_i,col_i
+
+# ╔═╡ ff762861-b186-4eb0-9582-0ce66ca10f60
+philip[row_i, col_i]
 
 # ╔═╡ c9ed950c-dcd9-4296-a431-ee0f36d5b557
 md"""
@@ -464,7 +452,7 @@ md"""
 # ╔═╡ 63e8d636-ee0b-11ea-173d-bd3327347d55
 function invert(color::AbstractRGB)
 	
-	return missing
+	return RGB(1 - color.r, 1 - color.g, 1 - color.b)
 end
 
 # ╔═╡ 2cc2f84e-ee0d-11ea-373b-e7ad3204bb00
@@ -486,7 +474,7 @@ invert(red)
 md"Can you invert the picture of Philip?"
 
 # ╔═╡ 943103e2-ee0b-11ea-33aa-75a8a1529931
-philip_inverted = missing
+philip_inverted = invert.(philip)
 
 # ╔═╡ 2ee543b2-64d6-11eb-3c39-c5660141787e
 md"""
@@ -561,31 +549,10 @@ md"""
 
 # ╔═╡ b6b65b94-edf0-11ea-3686-fbff0ff53d08
 function create_bar()
+	bar = zeros(100)
+	bar[41:60] .= 1
 	
-	return missing
-end
-
-# ╔═╡ d862fb16-edf1-11ea-36ec-615d521e6bc0
-colored_line(create_bar())
-
-# ╔═╡ e3394c8a-edf0-11ea-1bb8-619f7abb6881
-if !@isdefined(create_bar)
-	not_defined(:create_bar)
-else
-	let
-		result = create_bar()
-		if ismissing(result)
-			still_missing()
-		elseif isnothing(result)
-			keep_working(md"Did you forget to write `return`?")
-		elseif !(result isa Vector) || length(result) != 100
-			keep_working(md"The result should be a `Vector` with 100 elements.")
-		elseif result[[1,50,100]] != [0,1,0]
-			keep_working()
-		else
-			correct()
-		end
-	end
+	return bar
 end
 
 # ╔═╡ 693af19c-64cc-11eb-31f3-57ab2fbae597
@@ -786,22 +753,22 @@ md"""
 > Make three sliders with variables `r`, `g` and `b`. Then make a single color patch with the RGB color given by those values.
 """
 
+# ╔═╡ e01fb06a-3be2-4f02-af8a-88d1141bf223
+@bind r Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ 19956bda-2828-4931-bc15-e6577e66bbe1
+@bind g Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ 3b420ccf-4ecb-4d9d-b052-6c6398c6dc1c
+@bind b Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ 40331f9c-8a83-4819-bd6d-cfef1fe91fc2
+RGB(r, g, b)
+
 # ╔═╡ 576d5e3a-64d8-11eb-10c9-876be31f7830
 md"""
 We can do the same to create different size matrices, by creating two sliders, one for reds and one for greens. Try it out!
 """
-
-# ╔═╡ 2a94a2cf-b697-4b0b-afd0-af2e35af2bb1
-@bind webcam_data camera_input()
-
-# ╔═╡ 3e0ece65-b8a7-4be7-ae44-6d7210c2e15b
-myface = process_raw_camera_data(webcam_data);
-
-# ╔═╡ 4ee18bee-13e6-4478-b2ca-ab66100e57ec
-[
-	myface              myface[   :    , end:-1:1]
-	myface[end:-1:1, :] myface[end:-1:1, end:-1:1]
-]
 
 # ╔═╡ ace86c8a-60ee-11eb-34ef-93c54abc7b1a
 md"""
@@ -821,14 +788,14 @@ md"""
 ----
 """
 
-# ╔═╡ 45815734-ee0a-11ea-2982-595e1fc0e7b1
-bigbreak
-
 # ╔═╡ 5da8cbe8-eded-11ea-2e43-c5b7cc71e133
 begin
 	colored_line(x::Vector{<:Real}) = Gray.(Float64.((hcat(x)')))
 	colored_line(x::Any) = nothing
 end
+
+# ╔═╡ d862fb16-edf1-11ea-36ec-615d521e6bc0
+colored_line(create_bar())
 
 # ╔═╡ e074560a-601b-11eb-340e-47acd64f03b2
 hint(text) = Markdown.MD(Markdown.Admonition("hint", "Hint", [text]))
@@ -851,8 +818,31 @@ correct(text=rand(yays)) = Markdown.MD(Markdown.Admonition("correct", "Got it!",
 # ╔═╡ e0a4fc10-601b-11eb-211d-03570aca2726
 not_defined(variable_name) = Markdown.MD(Markdown.Admonition("danger", "Oopsie!", [md"Make sure that you define a variable called **$(Markdown.Code(string(variable_name)))**"]))
 
+# ╔═╡ e3394c8a-edf0-11ea-1bb8-619f7abb6881
+if !@isdefined(create_bar)
+	not_defined(:create_bar)
+else
+	let
+		result = create_bar()
+		if ismissing(result)
+			still_missing()
+		elseif isnothing(result)
+			keep_working(md"Did you forget to write `return`?")
+		elseif !(result isa Vector) || length(result) != 100
+			keep_working(md"The result should be a `Vector` with 100 elements.")
+		elseif result[[1,50,100]] != [0,1,0]
+			keep_working()
+		else
+			correct()
+		end
+	end
+end
+
 # ╔═╡ e0a6031c-601b-11eb-27a5-65140dd92897
 bigbreak = html"<br><br><br><br><br>";
+
+# ╔═╡ 45815734-ee0a-11ea-2982-595e1fc0e7b1
+bigbreak
 
 # ╔═╡ e0b15582-601b-11eb-26d6-bbf708933bc8
 function camera_input(;max_size=150, default_url="https://i.imgur.com/SUmi94P.png")
@@ -1058,6 +1048,12 @@ function camera_input(;max_size=150, default_url="https://i.imgur.com/SUmi94P.pn
 """ |> HTML
 end
 
+# ╔═╡ d6742ea0-1106-4f3c-a5b8-a31a48d33f19
+@bind webcam_data1 camera_input()
+
+# ╔═╡ 2a94a2cf-b697-4b0b-afd0-af2e35af2bb1
+@bind webcam_data camera_input()
+
 # ╔═╡ e891fce0-601b-11eb-383b-bde5b128822e
 
 function process_raw_camera_data(raw_camera_data)
@@ -1092,6 +1088,24 @@ function process_raw_camera_data(raw_camera_data)
 	
 	RGB.(reds, greens, blues)
 end
+
+# ╔═╡ 1d7375b7-7ea6-4d67-ab73-1c69d6b8b87f
+myface1 = process_raw_camera_data(webcam_data1);
+
+# ╔═╡ 6224c74b-8915-4983-abf0-30e6ba04a46d
+[
+	myface1              myface1[   :    , end:-1:1]
+	myface1[end:-1:1, :] myface1[end:-1:1, end:-1:1]
+]
+
+# ╔═╡ 3e0ece65-b8a7-4be7-ae44-6d7210c2e15b
+myface = process_raw_camera_data(webcam_data);
+
+# ╔═╡ 4ee18bee-13e6-4478-b2ca-ab66100e57ec
+[
+	myface              myface[   :    , end:-1:1]
+	myface[end:-1:1, :] myface[end:-1:1, end:-1:1]
+]
 
 # ╔═╡ 3ef77236-1867-4d02-8af2-ff4777fcd6d9
 exercise_css = html"""
@@ -1296,6 +1310,10 @@ md"_Lecture 1, Spring 2021, version 0_"
 # ╟─1c539b02-64d8-11eb-3505-c9288357d139
 # ╟─10f6e6da-64d8-11eb-366f-11f16e73043b
 # ╟─82a8314c-64d8-11eb-1acb-e33625381178
+# ╠═e01fb06a-3be2-4f02-af8a-88d1141bf223
+# ╠═19956bda-2828-4931-bc15-e6577e66bbe1
+# ╠═3b420ccf-4ecb-4d9d-b052-6c6398c6dc1c
+# ╠═40331f9c-8a83-4819-bd6d-cfef1fe91fc2
 # ╟─576d5e3a-64d8-11eb-10c9-876be31f7830
 # ╠═2a94a2cf-b697-4b0b-afd0-af2e35af2bb1
 # ╠═3e0ece65-b8a7-4be7-ae44-6d7210c2e15b

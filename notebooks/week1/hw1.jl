@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.21
+# v0.14.2
 
 using Markdown
 using InteractiveUtils
@@ -13,11 +13,6 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 29dfe3d6-c353-4081-8192-b12f374bf702
-filter!(LOAD_PATH) do path
-	path != "@v#.#"
-end;
-
 # ╔═╡ 65780f00-ed6b-11ea-1ecf-8b35523a7ac0
 begin
 	import Pkg
@@ -26,13 +21,20 @@ begin
 			Pkg.PackageSpec(name="Images", version="0.22.4"), 
 			Pkg.PackageSpec(name="ImageMagick", version="0.7"), 
 			Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
-			Pkg.PackageSpec(name="HypertextLiteral", version="0.5")
+			Pkg.PackageSpec(name="HypertextLiteral", version="0.5"),
 			])
+	Pkg.add("ImageIO")
 
 	using Images
+	using ImageIO
 	using PlutoUI
 	using HypertextLiteral
 end
+
+# ╔═╡ 29dfe3d6-c353-4081-8192-b12f374bf702
+filter!(LOAD_PATH) do path
+	path != "@v#.#"
+end;
 
 # ╔═╡ ac8ff080-ed61-11ea-3650-d9df06123e1f
 md"""
@@ -52,7 +54,7 @@ Feel free to ask questions!
 # ╔═╡ 911ccbce-ed68-11ea-3606-0384e7580d7c
 # edit the code below to set your name and kerberos ID (i.e. email without @mit.edu)
 
-student = (name = "Jazzy Doe", kerberos_id = "jazz")
+student = (name = "Qling", kerberos_id = "rfhklwt")
 
 # press the ▶ button in the bottom right of this cell to run your edits
 # or use Shift+Enter
@@ -63,7 +65,7 @@ student = (name = "Jazzy Doe", kerberos_id = "jazz")
 # ╔═╡ 8ef13896-ed68-11ea-160b-3550eeabbd7d
 md"""
 
-Submission by: **_$(student.name)_** ($(student.kerberos_id)@mit.edu)
+Submission by: **_$(student.name)_** ($(student.kerberos_id)@163.com)
 """
 
 # ╔═╡ 5f95e01a-ee0a-11ea-030c-9dba276aba92
@@ -92,7 +94,7 @@ $(html"<br>")
 """
 
 # ╔═╡ f51333a6-eded-11ea-34e6-bfbb3a69bcb0
-random_vect = missing # replace `missing` with your code!
+random_vect = rand(10)
 
 # ╔═╡ 5da8cbe8-eded-11ea-2e43-c5b7cc71e133
 begin
@@ -112,8 +114,13 @@ md"#### Exerise 1.2
 
 # ╔═╡ bd907ee1-5253-4cae-b5a5-267dac24362a
 function my_sum(xs)
-	# your code here!
-	return missing
+	res = xs[1]
+	
+	for i in 2:length(xs)
+		res += xs[i]
+	end
+	
+	return res
 end
 
 # ╔═╡ 6640110a-d171-4b32-8d12-26979a36b718
@@ -125,8 +132,9 @@ md"#### Exerise 1.3
 
 # ╔═╡ 0ffa8354-edee-11ea-2883-9d5bfea4a236
 function mean(xs)
-	# your code here!
-	return missing
+	res = length(xs)
+	
+	return my_sum(xs) / res
 end
 
 # ╔═╡ 1f104ce4-ee0e-11ea-2029-1d9c817175af
@@ -136,7 +144,7 @@ mean([1, 2, 3])
 md"👉 Define `m` to be the mean of `random_vect`."
 
 # ╔═╡ 2a391708-edee-11ea-124e-d14698171b68
-m = missing # replace `missing` with your code!
+m = mean(random_vect) # replace `missing` with your code!
 
 # ╔═╡ e2863d4c-edef-11ea-1d67-332ddca03cc4
 md"""#### Exerise 1.4
@@ -161,8 +169,7 @@ md"""
 
 # ╔═╡ ec5efe8c-edef-11ea-2c6f-afaaeb5bc50c
 function demean(xs)
-	# your code here!
-	return missing
+	return xs .- mean(xs)
 end
 
 # ╔═╡ d6ddafdd-1a44-48c7-b49a-554073cdf331
@@ -177,8 +184,6 @@ test_vect = let
 	# it regenerates the vector if you accidentally wrote a mutating function
 	
 	# don't worry about how it works for this exercise!
-	
-	demean
 	to_create
 end
 
@@ -202,8 +207,9 @@ md"""
 
 # ╔═╡ b6b65b94-edf0-11ea-3686-fbff0ff53d08
 function create_bar()
-	# your code here!
-	return missing
+	bar = zeros(100)
+	bar[41:60] .= 1
+	return bar
 end
 
 # ╔═╡ 4a5e9d2c-dd90-4bb0-9e31-3f5c834406b4
@@ -270,8 +276,7 @@ md"""
 
 # ╔═╡ a8b2270a-600c-4f83-939e-dc5ab35f4735
 function get_red(pixel::AbstractRGB)
-	# your code here!
-	return missing
+	return pixel.r
 end
 
 # ╔═╡ c320b39d-4cea-4fa1-b1ce-053c898a67a6
@@ -285,8 +290,7 @@ md"""
 
 # ╔═╡ ebe1d05c-f6aa-437d-83cb-df0ba30f20bf
 function get_reds(image::AbstractMatrix)
-	# your code here!
-	return missing
+	return get_red.(image)
 end
 
 # ╔═╡ c427554a-6f6a-43f1-b03b-f83239887cee
@@ -322,7 +326,7 @@ Use the ➕ button at the bottom left of this cell to add more cells.
 """
 
 # ╔═╡ 21ba6e75-55a2-4614-9b5d-ea6378bf1d98
-
+value_as_color.([0.0, 0.6, 1.0])
 
 # ╔═╡ f7825c18-ff28-4e23-bf26-cc64f2f5049a
 md"""
@@ -331,8 +335,17 @@ md"""
 👉 Write four more functions, `get_green`, `get_greens`, `get_blue` and `get_blues`, to be the equivalents of `get_red` and `get_reds`. Use the ➕ button at the bottom left of this cell to add new cells.
 """
 
-# ╔═╡ d994e178-78fd-46ab-a1bc-a31485423cad
+# ╔═╡ 74b636a1-2505-4ce1-be45-b309954d0d59
+get_green(pixel::AbstractRGB) = pixel.g
 
+# ╔═╡ 0c773b57-55d5-4573-9c9d-214d4295a3c6
+get_greens(image::AbstractMatrix) = get_green.(image)
+
+# ╔═╡ e7768654-aeaa-40e8-afa3-57d8490082ac
+get_blue(pixel::AbstractRGB) = pixel.b
+
+# ╔═╡ f7706780-5ffc-405b-9980-dad7987f3670
+get_blues(image::AbstractMatrix) = get_blue.(image)
 
 # ╔═╡ c54ccdea-ee05-11ea-0365-23aaf053b7d7
 md"""
@@ -340,10 +353,15 @@ md"""
 👉 Write a function **`mean_color`** that accepts an object called `image`. It should calculate the mean amounts of red, green and blue in the image and return the average color. Be sure to use functions from previous exercises!
 """
 
+# ╔═╡ d9dfbbcc-dc02-4be3-9ca6-19f7df299f19
+mean(get_blues(philip)) |> typeof
+
 # ╔═╡ f6898df6-ee07-11ea-2838-fde9bc739c11
 function mean_color(image)
-	# your code here!
-	return missing
+	r = get_reds(image) |> mean
+	g = get_greens(image) |> mean
+	b = get_blues(image) |> mean
+	return RGB(r, g, b)
 end
 
 # ╔═╡ 5be9b144-ee0d-11ea-2a8d-8775de265a1d
@@ -356,8 +374,8 @@ _At the end of this homework, you can see all of your filters applied to your we
 
 # ╔═╡ 63e8d636-ee0b-11ea-173d-bd3327347d55
 function invert(color::AbstractRGB)
-	# your code here!
-	return missing
+	
+	return RGB(1 - color.r, 1 - color.g, 1 - color.b)
 end
 
 # ╔═╡ 2cc2f84e-ee0d-11ea-373b-e7ad3204bb00
@@ -379,7 +397,7 @@ invert(color_red)
 md"👉 Can you invert the picture of Philip?"
 
 # ╔═╡ 943103e2-ee0b-11ea-33aa-75a8a1529931
-philip_inverted = missing # replace `missing` with your code!
+philip_inverted = invert.(philip)
 
 # ╔═╡ 55b138b7-19fb-4da1-9eb1-1e8304528251
 md"""
@@ -394,8 +412,8 @@ md"""
 
 # ╔═╡ fbd1638d-8d7a-4d12-aff9-9c160cc3fd74
 function quantize(x::Number)
-	# your code here!
-	return missing
+
+	return floor(10x) / 10
 end
 
 # ╔═╡ 7720740e-2d2b-47f7-98fd-500ed3eee479
@@ -449,8 +467,8 @@ The method you write should return a new `RGB` object, in which each component (
 
 # ╔═╡ 04e6b486-ceb7-45fe-a6ca-733703f16357
 function quantize(color::AbstractRGB)
-	# your code here!
-	return missing
+	
+	return RGB(quantize(color.r), quantize(color.g), quantize(color.b))
 end
 
 # ╔═╡ f6bf64da-ee07-11ea-3efb-05af01b14f67
@@ -460,10 +478,7 @@ md"""
 """
 
 # ╔═╡ 13e9ec8d-f615-4833-b1cf-0153010ccb65
-function quantize(image::AbstractMatrix)
-	# your code here!
-	return missing
-end
+quantize(image::AbstractMatrix) = quantize.(image)
 
 # ╔═╡ f6a655f8-ee07-11ea-13b6-43ca404ddfc7
 quantize(0.267), quantize(0.91)
@@ -482,8 +497,9 @@ md"""
 
 # ╔═╡ f38b198d-39cf-456f-a841-1ba08f206010
 function noisify(x::Number, s)
-	# your code here!
-	return missing
+	seed = rand() * 2s - s
+	
+	return clamp(x + seed, 0, 1)	
 end
 
 # ╔═╡ f6fc1312-ee07-11ea-39a0-299b67aee3d8
@@ -495,8 +511,8 @@ Use your previous method for `noisify`. _(Remember that Julia chooses which meth
 
 # ╔═╡ db4bad9f-df1c-4640-bb34-dd2fe9bdce18
 function noisify(color::AbstractRGB, s)
-	# your code here!
-	return missing
+	
+	return RGB(noisify(color.r, s), noisify(color.g, s), noisify(color.b, s))
 end
 
 # ╔═╡ 0000b7f8-4c43-4dd8-8665-0dfe59e74c0a
@@ -529,8 +545,8 @@ md"""
 
 # ╔═╡ 21a5885d-00ab-428b-96c3-c28c98c4ca6d
 function noisify(image::AbstractMatrix, s)
-	# your code here!
-	return missing
+
+	return noisify.(image, s)
 end
 
 # ╔═╡ 1ea53f41-b791-40e2-a0f8-04e13d856829
@@ -581,7 +597,7 @@ You may need noise intensities larger than 1. Why?
 
 # ╔═╡ bdc2df7c-ee0c-11ea-2e9f-7d2c085617c1
 answer_about_noise_intensity = md"""
-The image is unrecognisable with intensity ...
+The image is unrecognisable with intensity 1
 """
 
 # ╔═╡ e87e0d14-43a5-490d-84d9-b14ece472061
@@ -1284,9 +1300,9 @@ md"_homework 1, version 7_"
 # ╟─ad6a33b0-eded-11ea-324c-cfabfd658b56
 # ╠═f51333a6-eded-11ea-34e6-bfbb3a69bcb0
 # ╟─b18e2c54-edf1-11ea-0cbf-85946d64b6a2
-# ╠═397941fc-edee-11ea-33f2-5d46c759fbf7
+# ╟─397941fc-edee-11ea-33f2-5d46c759fbf7
 # ╟─b1d5ca28-edf6-11ea-269e-75a9fb549f1d
-# ╟─5da8cbe8-eded-11ea-2e43-c5b7cc71e133
+# ╠═5da8cbe8-eded-11ea-2e43-c5b7cc71e133
 # ╟─77adb065-bfd4-4680-9c2a-ad4d92689dbf
 # ╠═bd907ee1-5253-4cae-b5a5-267dac24362a
 # ╠═6640110a-d171-4b32-8d12-26979a36b718
@@ -1343,8 +1359,12 @@ md"_homework 1, version 7_"
 # ╟─3f1a670b-44c2-4cab-909c-65f4ae9ed14b
 # ╠═21ba6e75-55a2-4614-9b5d-ea6378bf1d98
 # ╟─f7825c18-ff28-4e23-bf26-cc64f2f5049a
-# ╠═d994e178-78fd-46ab-a1bc-a31485423cad
+# ╠═74b636a1-2505-4ce1-be45-b309954d0d59
+# ╠═0c773b57-55d5-4573-9c9d-214d4295a3c6
+# ╠═e7768654-aeaa-40e8-afa3-57d8490082ac
+# ╠═f7706780-5ffc-405b-9980-dad7987f3670
 # ╟─c54ccdea-ee05-11ea-0365-23aaf053b7d7
+# ╠═d9dfbbcc-dc02-4be3-9ca6-19f7df299f19
 # ╠═f6898df6-ee07-11ea-2838-fde9bc739c11
 # ╠═5be9b144-ee0d-11ea-2a8d-8775de265a1d
 # ╟─4d0158d0-ee0d-11ea-17c3-c169d4284acb

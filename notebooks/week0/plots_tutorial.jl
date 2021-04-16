@@ -1,8 +1,27 @@
 ### A Pluto.jl notebook ###
-# v0.14.1
+# v0.14.2
 
 using Markdown
 using InteractiveUtils
+
+# ╔═╡ 3fa5970e-8d82-11eb-302e-d53a453e984f
+begin
+	import Pkg;
+	Pkg.add("SpecialFunctions");
+	using SpecialFunctions
+end
+
+# ╔═╡ 2e8a0d14-8d6a-11eb-3a36-01676cf20447
+begin
+	Pkg.add(["VegaLite", "VegaDatasets"]);
+	using VegaLite, VegaDatasets
+end
+
+# ╔═╡ 8d4852d8-88d4-11eb-10e6-51c750d36b54
+begin
+	Pkg.add("PlutoUI")
+	using PlutoUI
+end
 
 # ╔═╡ f1261dab-6736-4b0a-803b-b2d2836ca24a
 Pkg.add("ColorSchemes")
@@ -10,17 +29,8 @@ Pkg.add("ColorSchemes")
 # ╔═╡ 1ccb3a84-88d4-11eb-2499-91af66e78e89
 using Plots
 
-# ╔═╡ 3fa5970e-8d82-11eb-302e-d53a453e984f
-using SpecialFunctions
-
-# ╔═╡ 2e8a0d14-8d6a-11eb-3a36-01676cf20447
-using VegaLite, VegaDatasets
-
 # ╔═╡ a400134c-8dc7-11eb-3a29-f99c5910de8c
 using DataFrames
-
-# ╔═╡ 8d4852d8-88d4-11eb-10e6-51c750d36b54
-using PlutoUI
 
 # ╔═╡ 47452d72-88d6-11eb-27ef-bbc1d061060d
 md"""
@@ -75,9 +85,6 @@ plot!(legend=false, axis=false, grid=false, ticks=false )
 md"""
 ## Lines and points
 """
-
-# ╔═╡ a2114f43-709f-46c2-ba16-8030ec83a2ce
-
 
 # ╔═╡ cf89db1e-88d7-11eb-2a92-850c7d46a296
 md"""
@@ -302,9 +309,6 @@ begin
 	plot(exp.(x), yaxis=:log)
 end
 
-# ╔═╡ 71d1e4f0-8dad-11eb-368c-4b8bf284f5ec
-
-
 # ╔═╡ eb3e721e-88d4-11eb-1f09-cfba69f498d4
 TableOfContents()
 
@@ -318,8 +322,7 @@ TableOfContents()
 # ╠═6b55e978-88d5-11eb-1fea-739e61bbb35a
 # ╟─198eb00c-88d5-11eb-3d3c-3963d197f0e0
 # ╠═2b4cc1d0-88d5-11eb-0afd-3988abd9a870
-# ╠═dd81f7a5-1acf-430d-9d25-ab2877bf34cf
-# ╠═a2114f43-709f-46c2-ba16-8030ec83a2ce
+# ╟─dd81f7a5-1acf-430d-9d25-ab2877bf34cf
 # ╟─cf89db1e-88d7-11eb-2a92-850c7d46a296
 # ╠═da7b4c10-88d7-11eb-011e-dbb639e6fa2b
 # ╟─cca58686-88d8-11eb-2fe4-d7d378c5408a
@@ -366,7 +369,6 @@ TableOfContents()
 # ╠═e9b2b30e-8da4-11eb-04b3-8ba421898f0a
 # ╠═311ce496-8dad-11eb-330c-d3757a6fac8f
 # ╠═5ae674d6-8dad-11eb-3abf-6fdbbb6cfe43
-# ╠═71d1e4f0-8dad-11eb-368c-4b8bf284f5ec
 # ╠═8d4852d8-88d4-11eb-10e6-51c750d36b54
 # ╟─eb3e721e-88d4-11eb-1f09-cfba69f498d4
 # ╠═f1261dab-6736-4b0a-803b-b2d2836ca24a

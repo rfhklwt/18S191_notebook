@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.20
+# v0.14.1
 
 using Markdown
 using InteractiveUtils
@@ -13,13 +13,35 @@ macro bind(def, element)
     end
 end
 
+# ╔═╡ 851c03a4-e7a4-11ea-1652-d59b7a6599f0
+# setting up an empty package environment
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.Registry.update()
+end
+
+# ╔═╡ d6ee91ea-e750-11ea-1260-31ebf3ec6a9b
+# add (ie install) a package to our environment
+begin
+	Pkg.add("Compose")
+	# call `using` so that we can use it in our code
+	using Compose
+end
+
+# ╔═╡ 5acd58e0-e856-11ea-2d3d-8329889fe16f
+begin
+	Pkg.add("PlutoUI")
+	using PlutoUI
+end
+
 # ╔═╡ fafae38e-e852-11ea-1208-732b4744e4c2
 md"_Homework 0, version 3 -- Spring 2021_"
 
 # ╔═╡ 7308bc54-e6cd-11ea-0eab-83f7535edf25
 # edit the code below to set your name and kerberos ID (i.e. email without @mit.edu)
 
-student = (name = "Jazzy Doe", kerberos_id = "jazz")
+student = (name = "Qling", kerberos_id = "rfhklwt")
 
 # press the ▶ button in the bottom right of this cell to run your edits
 # or use Shift+Enter
@@ -30,7 +52,7 @@ student = (name = "Jazzy Doe", kerberos_id = "jazz")
 # ╔═╡ cdff6730-e785-11ea-2546-4969521b33a7
 md"""
 
-Submission by: **_$(student.name)_** ($(student.kerberos_id)@mit.edu)
+Submission by: **_$(student.name)_** ($(student.kerberos_id)@163.com)
 """
 
 # ╔═╡ a2181260-e6cd-11ea-2a69-8d9d31d1ef0e
@@ -85,7 +107,7 @@ Output: $x^2$
 
 # ╔═╡ e02f7ea6-7024-11eb-3672-fd59a6cff79b
 function basic_square(x)
-	return 1 # this is wrong, write your code here!
+	return x^2
 end
 
 # ╔═╡ 6acef56c-7025-11eb-2524-819c30a75d39
@@ -173,7 +195,11 @@ Write a function newton_sqrt(x) which implements the above algorithm."
 
 # ╔═╡ 4896bf0c-e754-11ea-19dc-1380bb356ab6
 function newton_sqrt(x, error_margin=0.01, a=x / 2) # a=x/2 is the default value of `a`
-	return x # this is wrong, write your code here!
+	while abs(x - a^2) > error_margin
+		a = (x/a + a) / 2
+	end
+	
+	return a
 end
 
 # ╔═╡ 7a01a508-e78a-11ea-11da-999d38785348
@@ -230,33 +256,11 @@ md"To draw Sierpinski's triangle, we are going to use an external package, [_Com
 A package contains a coherent set of functionality that you can often use a black box according to its specification. There are [lots of Julia packages](https://juliahub.com/ui/Home).
 "
 
-# ╔═╡ 851c03a4-e7a4-11ea-1652-d59b7a6599f0
-# setting up an empty package environment
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-	Pkg.Registry.update()
-end
-
-# ╔═╡ d6ee91ea-e750-11ea-1260-31ebf3ec6a9b
-# add (ie install) a package to our environment
-begin
-	Pkg.add("Compose")
-	# call `using` so that we can use it in our code
-	using Compose
-end
-
-# ╔═╡ 5acd58e0-e856-11ea-2d3d-8329889fe16f
-begin
-	Pkg.add("PlutoUI")
-	using PlutoUI
-end
-
 # ╔═╡ dbc4da6a-e7b4-11ea-3b70-6f2abfcab992
 md"Just like the definition above, our `sierpinksi` function is _recursive_: it calls itself."
 
 # ╔═╡ 02b9c9d6-e752-11ea-0f32-91b7b6481684
-complexity = 3
+complexity = 5
 
 # ╔═╡ 1eb79812-e7b5-11ea-1c10-63b24803dd8a
 if complexity == 3 
@@ -290,7 +294,11 @@ area_sierpinski(1) = 0.??
 
 # ╔═╡ ca8d2f72-e7b6-11ea-1893-f1e6d0a20dc7
 function area_sierpinski(n)
-	return 1.0
+	if n == 0
+		return 1
+	else
+		return 3 / 4 * area_sierpinski(n - 1)
+	end	
 end
 
 # ╔═╡ 71c78614-e7bc-11ea-0959-c7a91a10d481
