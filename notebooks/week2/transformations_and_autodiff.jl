@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.0
+# v0.14.5
 
 using Markdown
 using InteractiveUtils
@@ -12,6 +12,40 @@ macro bind(def, element)
         el
     end
 end
+
+# ╔═╡ 6b473b2d-4326-46b4-af38-07b61de287fc
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.add([
+		Pkg.PackageSpec(name="ImageIO", version="0.5"),
+		Pkg.PackageSpec(name="ImageShow", version="0.2"),
+		Pkg.PackageSpec(name="FileIO", version="1.6"),
+		Pkg.PackageSpec(name="PNGFiles", version="0.3.6"),
+		Pkg.PackageSpec(name="Colors", version="0.12"),
+		Pkg.PackageSpec(name="ColorVectorSpace", version="0.8"),
+
+		Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
+		Pkg.PackageSpec(name="HypertextLiteral", version="0.5"), 
+		Pkg.PackageSpec(name="ForwardDiff", version="0.10")
+	])
+
+	using Colors, ColorVectorSpace, ImageShow, FileIO
+	using PlutoUI
+	using HypertextLiteral
+	using LinearAlgebra
+	using ForwardDiff
+end
+
+# ╔═╡ d49682ff-d529-4283-871b-f8ee50a4e6ee
+filter!(LOAD_PATH) do path
+	path != "@v#.#"
+end;
+
+# ╔═╡ 2e8c4a48-d535-44ac-a1f1-4cb26c4aece6
+filter!(LOAD_PATH) do path
+	path != "@v#.#"
+end;
 
 # ╔═╡ c09c8ba0-887e-11eb-07e3-71377ec0e708
 html"""
@@ -74,35 +108,6 @@ md"""
 _When running this notebook for the first time, this could take up to 15 minutes. Hang in there!_
 """
 
-# ╔═╡ 6b473b2d-4326-46b4-af38-07b61de287fc
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-	Pkg.add([
-		Pkg.PackageSpec(name="ImageIO", version="0.5"),
-		Pkg.PackageSpec(name="ImageShow", version="0.2"),
-		Pkg.PackageSpec(name="FileIO", version="1.6"),
-		Pkg.PackageSpec(name="PNGFiles", version="0.3.6"),
-		Pkg.PackageSpec(name="Colors", version="0.12"),
-		Pkg.PackageSpec(name="ColorVectorSpace", version="0.8"),
-
-		Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
-		Pkg.PackageSpec(name="HypertextLiteral", version="0.5"), 
-		Pkg.PackageSpec(name="ForwardDiff", version="0.10")
-	])
-
-	using Colors, ColorVectorSpace, ImageShow, FileIO
-	using PlutoUI
-	using HypertextLiteral
-	using LinearAlgebra
-	using ForwardDiff
-end
-
-# ╔═╡ d49682ff-d529-4283-871b-f8ee50a4e6ee
-filter!(LOAD_PATH) do path
-	path != "@v#.#"
-end;
-
 # ╔═╡ 58a520ca-763b-11eb-21f4-3f27aafbc498
 md"""
 Last time, recall we defined linear combinations of images.  Remember we
@@ -143,19 +148,16 @@ f₁(5)
 x->sin(x)
 
 # ╔═╡ 98498f84-76ab-11eb-23cf-857c776a9163
-(x->sin(x))(π/2)
+(x->sin(x))(π/2) # <=> g(π/2) where g = x->sin(x)
 
 # ╔═╡ c6c860a6-76ab-11eb-1dec-1b2f179a0fa9
-# long form
-function f₃(x,α=3) # default parameter
-	return x^α  # the "return" is optional
-end
+f₃(x, α=3) = x^α
 
 # ╔═╡ f07fbc6c-76ab-11eb-3382-87c7d65b4078
  f₃(5)
 
 # ╔═╡ f4fa8c1a-76ab-11eb-302d-bd410432e3cf
-f₃(5,2)
+f₃(5, 2)
 
 # ╔═╡ b3faf4d8-76ac-11eb-0be9-7dda3d37aba0
 md"""
@@ -166,7 +168,7 @@ Keywords
 f₄(x;α) = x^α
 
 # ╔═╡ 87b99c8a-76ac-11eb-1c94-8f1ffe3be593
-f₄(2, α=5)
+f₄(2; α=5)
 
 # ╔═╡ 504076fc-76ac-11eb-30c3-bfa75c991cb2
 md"""
@@ -186,8 +188,8 @@ Automatic differentiation is a key enabling technology for machine learning and 
 # ╔═╡ d42aec08-76ad-11eb-361a-a1f2c90fd4ec
 ForwardDiff.derivative(f₁, 5)
 
-# ╔═╡ 06437040-76ae-11eb-0b1c-23a6470f41c8
-ForwardDiff.derivative( x->f₃(x,3), 5)
+# ╔═╡ 85d96989-b9eb-454b-9ca7-6454f19de12e
+ForwardDiff.derivative(x->f₃(x, 3), 5) == 3 * 5^2
 
 # ╔═╡ 28cd454c-76ae-11eb-0d1e-a56995100d59
 md"""
@@ -228,11 +230,11 @@ e.g. $f_5(x) = 5\sin(x_1*x_2) + 2x_2/4x_3$
 # ╔═╡ 8c6b0236-76b4-11eb-2acf-91da23bedf0e
 begin
 	f₅(v) = 5sin(v[1]*v[2]) + 2*v[2]/4v[3]
-	f₅(x,y,z) = 5sin(x*y) + 2*y/4z
+	f₅(x, y, z) = 5sin(x*y) + 2*y/4z
 end
 
 # ╔═╡ a397d526-76b5-11eb-3cce-4374e33324d1
-f₅(1,2,3), f₅([1,2,3])
+f₅(1, 2, 3), f₅([1, 2, 3])
 
 # ╔═╡ 4a57d898-76b6-11eb-15ea-7be43393922c
 md"""
@@ -241,8 +243,8 @@ Better yet if you must write it the two ways ( you probably won't need to, but i
 
 # ╔═╡ bf23ab30-76b5-11eb-1adb-3d74a52cddfd
 begin
-	f₆( x,y,z)  = 5sin(x*y) + 2*y/4z
-	f₆( v ) = f₆(v[1],v[2],v[3])
+	f₆(x, y, z) = 5sin(x*y) + 2*y/4z
+	f₆(v) = f₆(v[1],v[2],v[3])
 end
 
 # ╔═╡ d5d4ac48-76b6-11eb-1687-ed853c2db7c9
@@ -278,7 +280,7 @@ In many applications, including machine learning, one needs to take derivatives 
 """
 
 # ╔═╡ ef06cfd8-76b7-11eb-1530-1fcd7e5c5992
-ForwardDiff.gradient(f₅,[1,2,3])
+ForwardDiff.gradient(f₅, [1,2,3])
 
 # ╔═╡ 051db7a0-76b8-11eb-14c7-531f42ef60b8
 md"""
@@ -293,10 +295,10 @@ One can check numerically by adding a small change to each of the arguments.m
 
 # ╔═╡ 2705bf34-76b8-11eb-3aaa-d363085784ff
 begin
-	∂f₅∂x =  (f₅(1+ϵ, 2, 3  ) -f₅(1, 2, 3)) / ϵ
-	∂f₅∂y =  (f₅(1, 2+ϵ, 3  ) -f₅(1, 2, 3)) / ϵ
-	∂f₅∂z =  (f₅(1, 2,   3+ϵ) -f₅(1, 2, 3)) / ϵ
-	∇f = [ ∂f₅∂x , ∂f₅∂y, ∂f₅∂z]
+	∂f₅∂x = (f₅(1 + ϵ, 2, 3) - f₅(1, 2, 3)) / ϵ
+	∂f₅∂y = (f₅(1, 2 + ϵ, 3) - f₅(1, 2, 3)) / ϵ
+	∂f₅∂z = (f₅(1, 2, 3 + ϵ) - f₅(1, 2, 3)) / ϵ
+	∇f = [∂f₅∂x, ∂f₅∂y, ∂f₅∂z]
 end
 
 # ╔═╡ dfb9d74c-76b8-11eb-24ff-e521f1294a6f
@@ -326,17 +328,40 @@ Let us consider a few functions that take in a vector of size 2 and returns a ve
 
 # ╔═╡ d364f91a-76b9-11eb-1807-75e733940d53
 begin
-	 idy((x,y)) = [x,y]
-	 lin1((x,y)) =  [ 2x + 3y, -5x+4x ]
-	 scalex(α) = ((x,y),) -> (α*x, y)
-	 scaley(α) = ((x,y),) -> (x,   α*y)
-	 rot(θ) = ((x,y),) -> [cos(θ)*x + sin(θ)*y, -sin(θ)*x + cos(θ)*y]
-	 shear(α) = ((x,y),) -> [x+α*y,y]
-	 genlin(a,b,c,d) = ((x,y),) -> [ a*x + b*y ; c*x + d*y ]
+	idy((x,y)) = [x,y]
+	lin1((x,y)) =  [2x + 3y, -5x+4x]
+	scalex(α) = ((x, y), ) -> (α * x, y)
+	scaley(α) = ((x, y), ) -> (x, α * y)
+	rot(θ) = ((x, y), ) -> [cos(θ)*x + sin(θ)*y, -sin(θ)*x + cos(θ)*y]
+	shear(α) = ((x, y), ) -> [x + α * y, y]
+	genlin(a, b, c, d) = ((x, y), ) -> [a*x + b*y; c*x + d*y]
 end
 
+# ╔═╡ 98936c7f-a628-4338-8b53-529a09199ec2
+md"""
+	Testing...
+"""
+
+# ╔═╡ 28027825-9dd7-40ff-a928-2687298b445e
+idy([1, 2])
+
+# ╔═╡ c85584e2-0a41-4923-a886-a7c43250565b
+lin1([1, 2])
+
+# ╔═╡ 392320b1-f8c6-4831-9a74-047782d6f2f4
+scalex(π)([1, 2]) == (π * 1, 2)
+
+# ╔═╡ c3b1012d-0ee2-450e-8f56-f5998a848ede
+scaley(π)([1, 2]) == (1, π * 2)
+
 # ╔═╡ f25c6308-76b9-11eb-3563-1f0ef4cdf86a
-rot(π/2)([4,5])
+rot(π/2)([4, 5]) == [cos(π/2)*4 + sin(π/2)*5, -sin(π/2)*4 + cos(π/2)*5]
+
+# ╔═╡ 0fbba269-a289-4cea-8fe9-79277bee8190
+shear(π/2)([4, 5]) == [4 + π/2 * 5, 5]
+
+# ╔═╡ 127e28ff-c25b-400c-9151-6d9ad03f9602
+genlin(1, 2, 3, 4)([4, 5]) == [1*4 + 2*5; 3*4 + 4*5]
 
 # ╔═╡ c9a148f0-76bb-11eb-0778-9d3e84369a19
 md"""
@@ -368,9 +393,9 @@ begin
 		end
 	end
 	
-	rθ(x) = ( norm(x), atan(x[2],x[1])) # maybe vectors are more readable here?
+	rθ(x) = (norm(x), atan(x[2],x[1])) # maybe vectors are more readable here?
 	
-	xy((r,θ)) = ( r*cos(θ), r*sin(θ))
+	xy((r,θ)) = (r*cos(θ), r*sin(θ))
 end
 
 # ╔═╡ bf28c388-76bd-11eb-08a7-af2671218017
@@ -424,18 +449,6 @@ md"""
 Matrices are often thought of as containers of numbers in a rectangular array, and hence one thinks of manipulating these tables like a spreadsheet, but actually the deeper meaning is that it is a transformation.
 """
 
-# ╔═╡ 2e8c4a48-d535-44ac-a1f1-4cb26c4aece6
-filter!(LOAD_PATH) do path
-	path != "@v#.#"
-end;
-
-# ╔═╡ c0c90fec-0e55-4be3-8ea2-88b8705ee258
-md"""
-#### Choose an image:
-
-$(@bind img_source Select(img_sources))
-"""
-
 # ╔═╡ ce55beee-7643-11eb-04bc-b517703facff
 md"""
 α= $(@bind α Slider(.1:.1:3, show_value=true))
@@ -479,22 +492,6 @@ top left zoom =	$(@bind f Slider(.1:1:3, show_value=true, default=1))
 # ╔═╡ 60532aa0-740c-11eb-0402-af8ff117f042
 md"Show grid lines $(@bind show_grid CheckBox(default=true))"
 
-# ╔═╡ 8e0505be-359b-4459-9de3-f87ec7b60c23
-[
-	if det_A == 0
-		RGB(1.0, 1.0, 1.0)
-	else
-		
-		 # in_x, in_y = A \ [out_x, out_y]
-         # in_x, in_y = xy( [out_x, out_y] )
-		in_x, in_y =  T([out_x, out_y])
-		trygetpixel(img, in_x, in_y)
-	end
-	
-	for out_y in LinRange(f, -f, 500),
-		out_x in LinRange(-f, f, 500)
-]
-
 # ╔═╡ f085296d-48b1-4db6-bb87-db863bb54049
 A = [
 	a b
@@ -529,7 +526,7 @@ md"""
 Computer Science
 Solving 2 equations in 2 unknowns, and higher dimensional analogs.
 
-THe top 500 supercomputers, and how many equations in how many unknowns are being solved today.
+The top 500 supercomputers, and how many equations in how many unknowns are being solved today.
 """
 
 # ╔═╡ a66eb6fe-76b3-11eb-1d50-659ec2bf7c44
@@ -569,18 +566,24 @@ img_sources = [
 	"https://images.squarespace-cdn.com/content/v1/5cb62a904d546e33119fa495/1589302981165-HHQ2A4JI07C43294HVPD/ke17ZwdGBToddI8pDm48kA7bHnZXCqgRu4g0_U7hbNpZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZamWLI2zvYWH8K3-s_4yszcp2ryTI0HqTOaaUohrI8PISCdr-3EAHMyS8K84wLA7X0UZoBreocI4zSJRMe1GOxcKMshLAGzx4R3EDFOm1kBS/fluffy+corgi?format=2500w" => "Long Corgi"
 ]
 
+# ╔═╡ c0c90fec-0e55-4be3-8ea2-88b8705ee258
+md"""
+#### Choose an image:
+
+$(@bind img_source Select(img_sources))
+"""
+
 # ╔═╡ 4fcb4ac1-1ad1-406e-8776-4675c0fdbb43
 img_original = load(download(img_source));
 
 # ╔═╡ 52a8009e-761c-11eb-2dc9-dbccdc5e7886
 typeof(img_original)
 
-# ╔═╡ 55898e88-36a0-4f49-897f-e0850bd2b0df
-img = if show_grid
-	with_gridlines(img_original)
-else
-	img_original
-end;
+# ╔═╡ b754bae2-762f-11eb-1c6a-01251495a9bb
+begin
+	white(c::RGB) = RGB(1,1,1)
+	white(c::RGBA) = RGBA(1,1,1,0.75)
+end
 
 # ╔═╡ 7d0096ad-d89a-4ade-9679-6ee95f7d2044
 function trygetpixel(img::AbstractMatrix, x::Float64, y::Float64)
@@ -598,12 +601,6 @@ function trygetpixel(img::AbstractMatrix, x::Float64, y::Float64)
 		white(img[1,1])
 
 	end
-end
-
-# ╔═╡ b754bae2-762f-11eb-1c6a-01251495a9bb
-begin
-	white(c::RGB) = RGB(1,1,1)
-	white(c::RGBA) = RGBA(1,1,1,0.75)
 end
 
 # ╔═╡ 83d45d42-7406-11eb-2a9c-e75efe62b12c
@@ -629,16 +626,28 @@ function with_gridlines(img::Array{<:Any,2}; n=16)
 	return result
 end
 
-# ╔═╡ 0f63345c-8887-11eb-3ef9-37dabb46de75
-<p style="
-font-size: 1.5rem;
-text-align: center;
-opacity: .8;
-"><em>Lecture Video</em></p>
-<div style="display: flex; justify-content: center;">
-<div  notthestyle="position: relative; right: 0; top: 0; z-index: 300;">
-<iframe src="https://www.youtube.com/embed/AAREeuaKCic" width=400 height=250  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-</div>
+# ╔═╡ 55898e88-36a0-4f49-897f-e0850bd2b0df
+img = if show_grid
+	with_gridlines(img_original)
+else
+	img_original
+end;
+
+# ╔═╡ 8e0505be-359b-4459-9de3-f87ec7b60c23
+[
+	if det_A == 0
+		RGB(1.0, 1.0, 1.0)
+	else
+		
+		 # in_x, in_y = A \ [out_x, out_y]
+         # in_x, in_y = xy( [out_x, out_y] )
+		in_x, in_y =  T([out_x, out_y])
+		trygetpixel(img, in_x, in_y)
+	end
+	
+	for out_y in LinRange(f, -f, 500),
+		out_x in LinRange(-f, f, 500)
+]
 
 # ╔═╡ Cell order:
 # ╟─c09c8ba0-887e-11eb-07e3-71377ec0e708
@@ -664,7 +673,7 @@ opacity: .8;
 # ╟─f1dd24d8-76ac-11eb-1de7-a763a1b95668
 # ╟─fe01da74-76ac-11eb-12e3-8320340b6139
 # ╠═d42aec08-76ad-11eb-361a-a1f2c90fd4ec
-# ╠═06437040-76ae-11eb-0b1c-23a6470f41c8
+# ╠═85d96989-b9eb-454b-9ca7-6454f19de12e
 # ╟─28cd454c-76ae-11eb-0d1e-a56995100d59
 # ╟─38b51946-76ae-11eb-2c8a-e19b30bf42cb
 # ╟─632a1f8c-76ae-11eb-2088-15c3e3c0a210
@@ -673,7 +682,7 @@ opacity: .8;
 # ╟─f7df6cda-76b1-11eb-11e4-8d0af0349651
 # ╟─63449b54-76b4-11eb-202f-3bda2f4cff4d
 # ╠═8c6b0236-76b4-11eb-2acf-91da23bedf0e
-# ╟─a397d526-76b5-11eb-3cce-4374e33324d1
+# ╠═a397d526-76b5-11eb-3cce-4374e33324d1
 # ╟─4a57d898-76b6-11eb-15ea-7be43393922c
 # ╠═bf23ab30-76b5-11eb-1adb-3d74a52cddfd
 # ╠═d5d4ac48-76b6-11eb-1687-ed853c2db7c9
@@ -694,7 +703,14 @@ opacity: .8;
 # ╟─ac1ab224-76bb-11eb-13cb-0bd44bea1042
 # ╟─bcf92688-76b9-11eb-30fb-1f320a65f45a
 # ╠═d364f91a-76b9-11eb-1807-75e733940d53
+# ╟─98936c7f-a628-4338-8b53-529a09199ec2
+# ╠═28027825-9dd7-40ff-a928-2687298b445e
+# ╠═c85584e2-0a41-4923-a886-a7c43250565b
+# ╠═392320b1-f8c6-4831-9a74-047782d6f2f4
+# ╠═c3b1012d-0ee2-450e-8f56-f5998a848ede
 # ╠═f25c6308-76b9-11eb-3563-1f0ef4cdf86a
+# ╠═0fbba269-a289-4cea-8fe9-79277bee8190
+# ╠═127e28ff-c25b-400c-9151-6d9ad03f9602
 # ╟─c9a148f0-76bb-11eb-0778-9d3e84369a19
 # ╠═db4bc328-76bb-11eb-28dc-eb9df8892d01
 # ╟─89f0bc54-76bb-11eb-271b-3190b4d8cbc0
@@ -737,4 +753,3 @@ opacity: .8;
 # ╠═7d0096ad-d89a-4ade-9679-6ee95f7d2044
 # ╠═b754bae2-762f-11eb-1c6a-01251495a9bb
 # ╠═83d45d42-7406-11eb-2a9c-e75efe62b12c
-# ╠═0f63345c-8887-11eb-3ef9-37dabb46de75

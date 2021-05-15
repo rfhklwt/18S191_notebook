@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.0
+# v0.14.5
 
 using Markdown
 using InteractiveUtils
@@ -12,6 +12,38 @@ macro bind(def, element)
         el
     end
 end
+
+# ╔═╡ 86f770fe-74a1-11eb-01f7-5b3ecf057124
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.add([
+		Pkg.PackageSpec(name="ImageIO", version="0.5"),
+		Pkg.PackageSpec(name="ImageShow", version="0.2"),
+		Pkg.PackageSpec(name="FileIO", version="1.6"),
+		Pkg.PackageSpec(name="PNGFiles", version="0.3.6"),
+		Pkg.PackageSpec(name="Colors", version="0.12"),
+		Pkg.PackageSpec(name="ColorVectorSpace", version="0.8"),
+		
+		Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
+		Pkg.PackageSpec(name="Unitful", version="1.6"), 
+		Pkg.PackageSpec(name="ImageFiltering", version="0.6"),
+		Pkg.PackageSpec(name="OffsetArrays", version="1.6"),
+		Pkg.PackageSpec(name="Plots", version="1.10")
+	])
+
+	using PlutoUI 
+	using Colors, ColorVectorSpace, ImageShow, FileIO
+	using Unitful 
+	using ImageFiltering
+	using OffsetArrays
+	using Plots
+end
+
+# ╔═╡ b310756a-af08-48b0-ae10-ee2e8dd0c968
+filter!(LOAD_PATH) do path
+	path != "@v#.#"
+end;
 
 # ╔═╡ febfa62a-74fa-11eb-2fe6-df7de43ef4b6
 html"""
@@ -74,38 +106,6 @@ md"""
 _When running this notebook for the first time, this could take up to 15 minutes. Hang in there!_
 """
 
-# ╔═╡ 86f770fe-74a1-11eb-01f7-5b3ecf057124
-begin
-	import Pkg
-	Pkg.activate(mktempdir())
-	Pkg.add([
-		Pkg.PackageSpec(name="ImageIO", version="0.5"),
-		Pkg.PackageSpec(name="ImageShow", version="0.2"),
-		Pkg.PackageSpec(name="FileIO", version="1.6"),
-		Pkg.PackageSpec(name="PNGFiles", version="0.3.6"),
-		Pkg.PackageSpec(name="Colors", version="0.12"),
-		Pkg.PackageSpec(name="ColorVectorSpace", version="0.8"),
-		
-		Pkg.PackageSpec(name="PlutoUI", version="0.7"), 
-		Pkg.PackageSpec(name="Unitful", version="1.6"), 
-		Pkg.PackageSpec(name="ImageFiltering", version="0.6"),
-		Pkg.PackageSpec(name="OffsetArrays", version="1.6"),
-		Pkg.PackageSpec(name="Plots", version="1.10")
-	])
-
-	using PlutoUI 
-	using Colors, ColorVectorSpace, ImageShow, FileIO
-	using Unitful 
-	using ImageFiltering
-	using OffsetArrays
-	using Plots
-end
-
-# ╔═╡ b310756a-af08-48b0-ae10-ee2e8dd0c968
-filter!(LOAD_PATH) do path
-	path != "@v#.#"
-end;
-
 # ╔═╡ 4d332c7e-74f8-11eb-1f49-a518246d1db8
 md"""
 # Announcement: Lectures will be nearly an hour
@@ -141,15 +141,13 @@ century^2
 g = 9.8u"m"/u"s"^2
 
 # ╔═╡ b76a56f4-74a9-11eb-1739-fbfc5e4958e8
-
-uconvert(u"minute", century * 1e-6 ) # convert into minutes the value of a microcentury
-
+uconvert(u"minute", century / 10e3) # convert into minutes the value of a microcentury
 
 # ╔═╡ 77fbf18a-74f9-11eb-1d9e-3f9d2097388f
 PotentialEnergy = (10u"kg") * g * (50u"m")
 
 # ╔═╡ bcb69db6-74f9-11eb-100a-29d1d23963ab
-uconvert( u"J",PotentialEnergy)
+uconvert( u"J", PotentialEnergy)
 
 # ╔═╡ fc70c4d2-74f8-11eb-33f5-539c278ed6b6
 md"""
@@ -180,10 +178,10 @@ a real corgi.
 """
 
 # ╔═╡ 14f2b85e-74ad-11eb-2682-d9de646aedf3
-pixelated_corgi = load(download("https://i.redd.it/99lhfbnwpgd31.png"))
+pixelated_corgi = load("pixelated_corgi.png")
 
 # ╔═╡ 516e73e2-74fb-11eb-213e-9dbd9472e0db
-philip =  load(download("https://user-images.githubusercontent.com/6933510/107239146-dcc3fd00-6a28-11eb-8c7b-41aaf6618935.png"))
+philip = load(download("https://user-images.githubusercontent.com/6933510/107239146-dcc3fd00-6a28-11eb-8c7b-41aaf6618935.png"))
 
 # ╔═╡ b5d0ef90-74fb-11eb-3126-792f954c7be7
 @bind r Slider(1:40, show_value=true, default=40)
@@ -192,7 +190,7 @@ philip =  load(download("https://user-images.githubusercontent.com/6933510/10723
 downsample_philip = philip[1:r:end, 1:r:end]
 
 # ╔═╡ 9eb917ba-74fb-11eb-0527-15e981ce9c6a
-upsample_philip = kron(downsample_philip, fill(1,r,r))
+upsample_philip = kron(downsample_philip, fill(1, r, r))
 
 # ╔═╡ 486d3022-74ff-11eb-1865-e15436bd9aad
 md"""
@@ -251,7 +249,7 @@ We need another image.  We could grab one from somewhere or we can just transfor
 """
 
 # ╔═╡ 9ce0b980-74aa-11eb-0678-01209451fb65
-upsidedown_corgis = corgis[ end:-1:1 , :]
+upsidedown_corgis = corgis[end: -1: 1, :]
 
 # ╔═╡ 68821bf4-7502-11eb-0d3c-03d7a00fdba4
 md"""
@@ -273,7 +271,7 @@ scale the two corgi pictures with different α's, thereby giving different weigh
 """
 
 # ╔═╡ aa541288-74aa-11eb-1edc-ab6d7786f271
-    @bind α Slider(0:.01:1 , show_value=true, default = 1.0)
+@bind α Slider(0:.01:1, show_value=true, default = 1.0)
 
 # ╔═╡ c9dcac48-74aa-11eb-31a6-23357180c1c8
 α .* corgis .+ (1-α) .* upsidedown_corgis
@@ -377,7 +375,7 @@ Some important computations can be greatly accelerated through the use of specia
 """
 
 # ╔═╡ 54448d18-7528-11eb-209a-9717affa0d02
- kernelize(M) = OffsetArray( M, -1:1, -1:1)	       
+ kernelize(M) = OffsetArray(M, -1: 1, -1: 1)
 
 # ╔═╡ acbc563a-7528-11eb-3c38-75a5b66c9241
 begin
@@ -399,7 +397,7 @@ end
 kernel_matrix[kernel_name]
 
 # ╔═╡ d22903d6-7529-11eb-2dcd-132cd27104c2
-[imfilter( corgis, kernelize(kernel_matrix[kernel_name])) Gray.(1.5 .* abs.(imfilter( corgis, kernelize(kernel_matrix[kernel_name])))) ]
+[imfilter(corgis, kernelize(kernel_matrix[kernel_name])) Gray.(1.5 .* abs.(imfilter( corgis, kernelize(kernel_matrix[kernel_name]))))]
 
 # ╔═╡ 844ed844-74b3-11eb-2ee1-2de664b26bc6
 md"""
@@ -465,10 +463,10 @@ md"""
 """
 
 # ╔═╡ d127303a-7521-11eb-3507-7341a416211f
-kernel[0,0]
+kernel[0, 0]
 
 # ╔═╡ d4581b56-7522-11eb-2c15-991c0c790e67
-kernel[-2,2]
+kernel[-2, 2]
 
 # ╔═╡ 40c15c3a-7523-11eb-1f2a-bd90b127dad2
 M = [ 1  2  3  4  5
@@ -479,10 +477,10 @@ M = [ 1  2  3  4  5
 Z = OffsetArray(M, -1:1, -2:2)
 
 # ╔═╡ deac4cf2-7523-11eb-2832-7b9d31389b08
-the_indices = [ c.I for c ∈ CartesianIndices(Z)]
+the_indices = [c.I for c ∈ CartesianIndices(Z)]
 
 # ╔═╡ 32887dfa-7524-11eb-35cd-051eff594fa9
-Z[1,-2]
+Z[1, -2]
 
 # ╔═╡ 0f765670-7506-11eb-2a37-931b15bb387f
 md"""
